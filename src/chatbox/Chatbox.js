@@ -1,34 +1,43 @@
+import { BotScript, Request } from "@yeuai/botscript";
+import { Widget, addResponseMessage } from 'react-chat-widget';
+import { useEffect } from "react";
+
+import 'react-chat-widget/lib/styles.css';
 import './Chatbox.scss';
 
-function Chatbox() {
+const bot = new BotScript();
+const request = new Request();
+
+/**
+ * Handle message request
+ * @param {string} msg
+ */
+async function handleNewUserMessage(msg) {
+  // await bot.init();
+  const reply = await bot.handleAsync(request.enter(msg));
+  addResponseMessage(reply.speechResponse);
+}
+
+async function initBot(botId) {
+  bot.parse(`
+    /include:
+      - https://raw.githubusercontent.com/yeuai/botscript/master/examples/definition.bot
+      - https://raw.githubusercontent.com/yeuai/botscript/master/examples/basic.bot
+      ${botId ? '- https://botscript.ai/api/kb/' + botId : ''}
+    `);
+    await bot.init();
+}
+
+function Chatbox(botId) {
+  useEffect(() => {
+    initBot();
+
+  });
   return (
-    <div id="botscript-chatbox">
-      <div id="chat-circle" className="btn btn-raised">
-        <div id="chat-overlay"></div>
-        <i className="material-icons">speaker_phone</i>
-      </div>
-
-      <div className="chat-box">
-        <div className="chat-box-header">
-          ChatBox
-        <span className="chat-box-toggle"><i className="material-icons">close</i></span>
-        </div>
-        <div className="chat-box-body">
-          <div className="chat-box-overlay">
-          </div>
-          <div className="chat-logs">
-
-          </div>
-        </div>
-        <div className="chat-input">
-          <form>
-            <input type="text" id="chat-input" placeholder="Send a message..." />
-            <button type="submit" className="chat-submit" id="chat-submit"><i className="material-icons">send</i></button>
-          </form>
-        </div>
-      </div>
-    </div>
-  )
+    <Widget handleNewUserMessage={handleNewUserMessage}
+      subtitle='💬Funny chat with your bot🤖'
+    />
+  );
 }
 
 export default Chatbox;
