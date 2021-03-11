@@ -1,6 +1,7 @@
 import { BotScript, Request } from "@yeuai/botscript";
-import { Widget, addResponseMessage } from 'react-chat-widget';
-import { useEffect } from "react";
+import { Widget, renderCustomComponent } from 'react-chat-widget';
+import { useEffect, Component } from "react";
+import parse from 'html-react-parser'
 
 import 'react-chat-widget/lib/styles.css';
 import './Chatbox.scss';
@@ -12,22 +13,49 @@ const bot = new BotScript();
 const request = new Request();
 
 /**
+ * Tùy chỉnh custom component
+ */
+class ReplyComponent extends Component {
+  render() {
+    return <div>{parse(this.props.reply.speechResponse)}</div>
+  }
+}
+
+/**
  * Handle message request
  * @param {string} msg
  */
 async function handleNewUserMessage(msg) {
-  // await bot.init();
   const reply = await bot.handleAsync(request.enter(msg));
-  addResponseMessage(reply.speechResponse);
+  renderCustomComponent(ReplyComponent, {reply}, true);
 }
 
+/**
+ * Init botscript
+ * Load/parse according to the following priority order
+ * 1. From jsx tag <BotScript id={<id>} />
+ * 2. From script tag:  <script async data-botid="p3PkBtuA" src="//chatbox.botscript.ai/embed.js">
+ * 3. From url query: ?bot=1234&action=edit
+ * @param {string} botId name of bot
+ */
 async function initBot(botId) {
-  // Ref: https://stackoverflow.com/a/22744637/1896897
-  // Eg: <script async data-botid="p3PkBtuA" src="//chatbox.botscript.ai/embed.js">
-  var me = document.querySelector('script[data-botid]');
-  if (me != null) {
-    botId = me.getAttribute('data-botid');
+  if (botId == null) {
+    // Parse bot from other location
+    // Ref: https://stackoverflow.com/a/22744637/1896897
+    if (document.querySelector('script[data-botid]') != null) {
+      botId = document.querySelector('script[data-botid]')?.getAttribute('data-botid');
+    } else {
+      // Trying to parse from url query.
+      const urlParams = new URLSearchParams(window.location.search);
+      botId = urlParams.get('bot');
+    }
   }
+
+  if (!botId) {
+    botId = 'PKVip Test';
+  }
+
+  // Parse bot knowledge
   bot.parse(`
     /include:
       - https://raw.githubusercontent.com/yeuai/botscript/master/examples/definition.bot
@@ -39,7 +67,7 @@ async function initBot(botId) {
 
 function Chatbox() {
   useEffect(() => {
-    initBot('PKVip Test');
+    initBot();
   });
   return (
     <Widget

@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@yeuai/botscript": "^1.5.2",
+    "html-react-parser": "^1.2.4",
     "react": "^17.0.1",
     "react-chat-widget": "^3.0.5",
     "react-dom": "^17.0.1"
