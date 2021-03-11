@@ -17,7 +17,8 @@ const request = new Request();
  */
 class ReplyComponent extends Component {
   render() {
-    return <div>{parse(this.props.reply.speechResponse)}</div>
+    let msg = this.props.reply.speechResponse;
+    return <div>{parse(msg)}</div>
   }
 }
 
