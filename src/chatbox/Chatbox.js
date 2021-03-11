@@ -1,11 +1,9 @@
 import { BotScript, Request } from "@yeuai/botscript";
-import { Widget, renderCustomComponent } from 'react-chat-widget';
-import { useEffect, Component } from "react";
-import parse from 'html-react-parser'
+import { Widget, addResponseMessage } from 'react-chat-widget';
+import { useEffect } from "react";
 
 import 'react-chat-widget/lib/styles.css';
 import './Chatbox.scss';
-
 import logo from './avatar.svg';
 
 
@@ -13,22 +11,14 @@ const bot = new BotScript();
 const request = new Request();
 
 /**
- * Tùy chỉnh custom component
- */
-class ReplyComponent extends Component {
-  render() {
-    let msg = this.props.reply.speechResponse;
-    return <div>{parse(msg)}</div>
-  }
-}
-
-/**
  * Handle message request
+ * Support msg in markdown format!
  * @param {string} msg
  */
 async function handleNewUserMessage(msg) {
   const reply = await bot.handleAsync(request.enter(msg));
-  renderCustomComponent(ReplyComponent, {reply}, true);
+  // renderCustomComponent(ReplyComponent, { reply }, true);
+  addResponseMessage(reply.speechResponse);
 }
 
 /**
