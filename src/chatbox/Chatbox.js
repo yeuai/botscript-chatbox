@@ -1,6 +1,6 @@
-import { BotScript, Request } from "@yeuai/botscript";
+import { BotScript, Request } from '@yeuai/botscript';
 import { Widget, addResponseMessage } from 'react-chat-widget';
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
 import 'react-chat-widget/lib/styles.css';
 import './Chatbox.scss';
